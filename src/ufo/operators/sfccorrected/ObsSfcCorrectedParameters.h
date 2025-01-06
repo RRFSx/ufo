@@ -22,7 +22,7 @@ namespace ufo {
 
 /// enum type for surface correction type, and ParameterTraitsHelper for it
 enum class SfcCorrectionType {
-  UKMO, WRFDA, RRFS_GSL
+  UKMO, WRFDA, GSL
 };
 struct SfcCorrectionTypeParameterTraitsHelper {
   typedef SfcCorrectionType EnumType;
@@ -30,7 +30,7 @@ struct SfcCorrectionTypeParameterTraitsHelper {
   static constexpr util::NamedEnumerator<SfcCorrectionType> namedValues[] = {
     { SfcCorrectionType::UKMO, "UKMO" },
     { SfcCorrectionType::WRFDA, "WRFDA" },
-    { SfcCorrectionType::RRFS_GSL, "RRFS_GSL" }
+    { SfcCorrectionType::GSL, "GSL" }
   };
 };
 
@@ -64,23 +64,66 @@ class ObsSfcCorrectedParameters : public ObsOperatorParametersBase {
      this};
 
   oops::Parameter<SfcCorrectionType> correctionType{"da_sfc_scheme",
-     "Scheme used for surface temperature correction (UKMO or WRFDA)",
+     "Scheme used for surface temperature correction (UKMO, WRFDA or GSL)",
      SfcCorrectionType::UKMO, this};
 
   /// Note: "height" default value has to be consistent with var_geomz defined
   /// in ufo_variables_mod.F90
   oops::Parameter<std::string> geovarGeomZ{"geovar_geomz",
      "Model variable for height of vertical levels",
-     "height", this};
+     "height_above_mean_sea_level", this};
 
   /// Note: "surface_altitude" default value has to be consistent with var_sfc_geomz
   /// in ufo_variables_mod.F90
   oops::Parameter<std::string> geovarSfcGeomZ{"geovar_sfc_geomz",
      "Model variable for surface height",
-     "surface_altitude", this};
+     "height_above_mean_sea_level_at_surface", this};
 
   /// Note: "station_altitude" default value is "stationElevation"
   oops::Parameter<std::string> ObsHeightName{"station_altitude", "stationElevation", this};
+  
+  /// Note: Only relevant if \c SfcCorrectionType is set to GSL, "lapse_rate_option" default value is "Local"
+  oops::Parameter<std::string> LapseRateOption{"lapse_rate_option", "Lapse rate option for surface temperature correction (Constant, Local or NoAdjustment)", "Local", this};
+
+  /// Note: Only relevant if \c SfcCorrectionType is set to GSL and \c LapseRateOption is set to "Constant", "lapse_rate" default value is adiabatic lapse rate 9.8 K/km
+  oops::Parameter<float> LapseRateValue
+    {"lapse_rate", 
+     "The lapse rate (K/km) used to adjust the observed surface temperature to "
+     "the model's surface level. Used if lapse rate option is set to constant, "
+     "otherwise ignored.",
+     9.8, 
+     this};
+
+  /// Note: Only relevant if \c SfcCorrectionType is set to GSL and \c LapseRateOption is set to "Local"
+  oops::Parameter<int> LocalLapseRateLevel
+    {"local_lapse_rate_level",
+     "The highest model level used to calculate the local lapse rate, "
+     "which adjusts the observed surface temperature to the model's surface level. "
+     "Used if lapse rate option is set to local, otherwise ignored.",
+     5,
+     this};
+
+  /// Should the local lapse rate be restricted to a specific range
+  /// Note: Only relevant if \c SfcCorrectionType is set to GSL and \c LapseRateOption is set to "Local"
+  oops::Parameter<bool> Threshold{"threshold", true, this};
+
+  /// Note: Only relevant if \c SfcCorrectionType is set to GSL, \c LapseRateOption is set to "Local", and \c Threshold is set to true
+  oops::Parameter<float> MinThreshold
+    {"min_threshold",
+     "The minimum lapse rate (K/km) can be applied to adjust the "
+     "observed surface temperature to the model's surface level. "
+     "Used if lapse rate option is set to local, otherwise ignored.",
+     0.5,
+     this};
+
+  /// Note: Only relevant if \c SfcCorrectionType is set to GSL, \c LapseRateOption is set to "Local", and \c Threshold is set to true
+  oops::Parameter<float> MaxThreshold
+    {"max_threshold",
+     "The maximum lapse rate (K/km) can be applied to adjust the "
+     "observed surface temperature to the model's surface level. "
+     "Used if lapse rate option is set to local, otherwise ignored.",
+     10.0,
+     this};
 };
 
 // -----------------------------------------------------------------------------
