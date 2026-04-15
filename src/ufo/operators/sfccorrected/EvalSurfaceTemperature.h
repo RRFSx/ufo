@@ -26,11 +26,11 @@ namespace ufo {
 
 class GeoVaLs;
 
-class airTemperatureAt2M_WRFDA : public SurfaceOperatorBase {
+class airTemperature_WRFDA : public SurfaceOperatorBase {
  public:
-  explicit airTemperatureAt2M_WRFDA(const std::string &,
+  explicit airTemperature_WRFDA(const std::string &,
                                     const Parameters_ &);
-  virtual ~airTemperatureAt2M_WRFDA() {}
+  virtual ~airTemperature_WRFDA() {}
 
   void simobs(const ufo::GeoVaLs &,
               const ioda::ObsSpace &,
@@ -40,11 +40,11 @@ class airTemperatureAt2M_WRFDA : public SurfaceOperatorBase {
   void AD() const override;
 };
 
-class airTemperatureAt2M_UKMO : public SurfaceOperatorBase {
+class airTemperature_UKMO : public SurfaceOperatorBase {
  public:
-  explicit airTemperatureAt2M_UKMO(const std::string &,
+  explicit airTemperature_UKMO(const std::string &,
                                    const Parameters_ &);
-  virtual ~airTemperatureAt2M_UKMO() {}
+  virtual ~airTemperature_UKMO() {}
 
   void simobs(const ufo::GeoVaLs &,
               const ioda::ObsSpace &,
@@ -54,11 +54,11 @@ class airTemperatureAt2M_UKMO : public SurfaceOperatorBase {
   void AD() const override;
 };
 
-class airTemperatureAt2M_GSL : public SurfaceOperatorBase {
+class airTemperature_GSL : public SurfaceOperatorBase {
  public:
-  explicit airTemperatureAt2M_GSL(const std::string &,
+  explicit airTemperature_GSL(const std::string &,
                                   const Parameters_ &);
-  virtual ~airTemperatureAt2M_GSL() {}
+  virtual ~airTemperature_GSL() {}
 
   void simobs(const ufo::GeoVaLs &,
               const ioda::ObsSpace &,
